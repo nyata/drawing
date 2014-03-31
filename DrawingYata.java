@@ -9,6 +9,9 @@
 
 import java.awt.*;// java gui
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import javax.imageio.ImageIO;
 import javax.swing.*;// java swing <- gui
 
 public class DrawingYata extends JPanel implements MouseMotionListener,
@@ -17,6 +20,7 @@ public class DrawingYata extends JPanel implements MouseMotionListener,
 // class クラス名 extends スーパークラス名 implements インターフェース名
   volatile Point pnt = new Point(0, 0);// volatile toha...
   volatile private Boolean clear = true;
+  public static JFrame jframe = new JFrame("hoge");
 
   // constructor
   public DrawingYata () {
@@ -52,11 +56,24 @@ public class DrawingYata extends JPanel implements MouseMotionListener,
     }
     if(e.getActionCommand() == "open") {
     }
+    if(e.getActionCommand() == "save") {
+      saveImage(jframe);
+    }
+  }
+
+  // save image
+  public static void saveImage(JFrame frame) {
+    try {
+      BufferedImage image = new BufferedImage(frame.getWidth(), frame.getHeight(), BufferedImage.TYPE_INT_RGB);
+      frame.paint(image.getGraphics());
+      ImageIO.write(image, "png", new File("out.png"));
+    } catch(IOException e) {
+    }
   }
 
   //
   public static void main(String[] args) {
-    final JFrame jframe = new JFrame("mouseEventTest");//jframeとタイトル
+    //final JFrame jframe = new JFrame("mouseEventTest");//jframeとタイトル
     
     JMenuBar menubar = new JMenuBar();
     JMenu menu1 = new JMenu("File");
@@ -93,7 +110,7 @@ public class DrawingYata extends JPanel implements MouseMotionListener,
 
     SwingUtilities.invokeLater(new Runnable() {//時間のかかる処理を任せるらしい
       public void run() {//ThreadTestTreadクラスのrunメソッド
-        jframe.setVisible(true);//フレームを表示
+          jframe.setVisible(true);//フレームを表示
       }
     });
   }
