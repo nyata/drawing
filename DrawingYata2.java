@@ -8,8 +8,8 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
-//import javaa.io.*;
-//import javax.imageio.ImageIO;
+import java.io.*;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class DrawingYata2 extends JPanel implements MouseListener,
@@ -18,9 +18,9 @@ public class DrawingYata2 extends JPanel implements MouseListener,
   volatile Point pnt = new Point(0, 0);
   volatile Point pnt2 = new Point(0, 0);
   volatile private Boolean clear = true;
-  //BufferedImage bufferImage = null;
-  //Graphics2D bufferGraphics = null;
-  //int x1, x2, y1, y2;
+  BufferedImage bufferImage = null;
+  Graphics2D bufferGraphics = null;
+  static JFrame jframe = new JFrame("mouseEventTest");
 
   public DrawingYata2() {
     addMouseMotionListener(this);
@@ -43,19 +43,13 @@ public class DrawingYata2 extends JPanel implements MouseListener,
   }
 
   public void mousePressed(MouseEvent e) {
-    //e.consume();
     pnt = e.getPoint();
-    System.out.println("hoge");
-    //pnt2 = e.getPoint();
-    //repaint();
   }
 
   public void mouseDragged(MouseEvent e) {
-    //e.consume();
     pnt2 = e.getPoint();
-    System.out.println("hoge2");
-    repaint();
-    //pnt = pnt2;
+    //repaint();
+    this.drawLineMethod();
   }
 
   public void actionPerformed(ActionEvent e) {
@@ -63,22 +57,38 @@ public class DrawingYata2 extends JPanel implements MouseListener,
     repaint();
   }
 
+  //線を引く
+  public void drawLineMethod() {
+    bufferGraphics.drawLine(pnt.x, pnt.y, pnt2.x, pnt2.y);
+    pnt = pnt2;
+    //System.out.println("draw");
+    repaint();
+  }
+
   public void paintComponent(Graphics g) {
+    //g.setColor(Color.black);
     if(clear) {
-      //画面を消す処理
-      g.clearRect(0, 0, 600, 400);
-      clear = false;
+      this.createBuffer(this.getWidth(), this.getHeight());
     } else {
-      //絵を書く処理
-      g.drawLine(pnt.x, pnt.y, pnt2.x, pnt2.y);
-      pnt = pnt2;
-      //System.out.println("hoge");
-      //g.fillRect(pnt2.x, pnt2.y, 2, 2);
+      //this.drawLineMethod();
+    }
+    super.paintComponent(g);
+    if(bufferImage != null) {
+      //System.out.println("bufferimage");
+      g.drawImage(bufferImage, 0, 0, this);
     }
   }
 
+  private void createBuffer(int width, int height) {
+    //System.out.println("create");
+    bufferImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_BGR);
+    bufferGraphics = bufferImage.createGraphics();
+    bufferGraphics.setBackground(Color.white);
+    bufferGraphics.clearRect(0, 0, width, height);
+    clear = false;
+  }
+
   public static void main(String[] args) {
-    final JFrame jframe = new JFrame("mouseEventTest");
     DrawingYata2 drawing = new DrawingYata2();
     drawing.setPreferredSize(new Dimension(600, 400));
     JButton jbutton = new JButton("clear");
