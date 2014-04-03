@@ -20,20 +20,42 @@ public class DrawingYata extends JPanel implements MouseMotionListener,
 // class クラス名 extends スーパークラス名 implements インターフェース名
   volatile Point pnt = new Point(0, 0);// volatile toha...
   volatile private Boolean clear = true;
-  public static JFrame jframe = new JFrame("hoge");
+  //public static JFrame jframe = new JFrame("hoge");
+  BufferedImage bufferImage = null;
+  Graphics2D bufferGraphics = null;
 
   // constructor
   public DrawingYata () {
     addMouseMotionListener(this);
   }
 
+  // buffer syori
+  public void createBuffer (int width, int height) {
+    bufferImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_BGR);
+    bufferGraphics = bufferImage.createGraphics();
+    bufferGraphics.setBackground(Color.white);
+    bufferGraphics.clearRect(0, 0, width, height);
+  }
+
+  public void drawLine (int x1, int y1, int x2, int y2) {
+    if(bufferGraphics == null) {
+      this.createBuffer(this.getWidth(), this.getHeight());
+    }
+    bufferGraphics.drawLine(x1, y1, x2, y2);
+    repaint();
+  }
+
   // 画面処理
   public void paintComponent (Graphics g) {
-    if(clear) {
+    /*if(clear) {
       g.clearRect(0, 0, 600, 400);// 背景を指定の色でクリア
       clear = false;
     } else {
       g.fillRect(pnt.x, pnt.y, 2, 2);// 2*2の四角形（塗りつぶしたやつ）
+    }*/
+    super.paintComponent(g);
+    if(bufferImage != null) {
+      g.drawImage(bufferImage, 0, 0, this);
     }
   }
 
@@ -57,23 +79,25 @@ public class DrawingYata extends JPanel implements MouseMotionListener,
     if(e.getActionCommand() == "open") {
     }
     if(e.getActionCommand() == "save") {
-      saveImage(jframe);
+      saveImage();
     }
   }
 
   // save image
-  public static void saveImage(JFrame frame) {
-    try {
-      BufferedImage image = new BufferedImage(frame.getWidth(), frame.getHeight(), BufferedImage.TYPE_INT_RGB);
-      frame.paint(image.getGraphics());
-      ImageIO.write(image, "png", new File("out.png"));
+  public static void saveImage() {
+    /*try {
+      ImageIO.write(drawing, "png", new File("out.png"));
     } catch(IOException e) {
-    }
+    }*/
+  }
+
+  public static void init() {
+    
   }
 
   //
   public static void main(String[] args) {
-    //final JFrame jframe = new JFrame("mouseEventTest");//jframeとタイトル
+    final JFrame jframe = new JFrame("mouseEventTest");//jframeとタイトル
     
     JMenuBar menubar = new JMenuBar();
     JMenu menu1 = new JMenu("File");
