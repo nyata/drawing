@@ -67,7 +67,6 @@ public class DrawingYata2 extends JPanel implements MouseListener,
   public void paintComponent(Graphics g) {
     if(clear) {
       this.createBuffer(this.getWidth(), this.getHeight());
-      System.out.println('b');
     } else {
     }
     super.paintComponent(g);
@@ -83,14 +82,38 @@ public class DrawingYata2 extends JPanel implements MouseListener,
     bufferGraphics.clearRect(0, 0, width, height);
     clear = false;
   }
+
+  private JMenu createMenu
+  ( String[] args, String menuName, ActionListener listener) {
+    JMenu menu = new JMenu(menuName);
+    JMenuItem[] menuItem = new JMenuItem[args.length];
+    for(int i = 0; i < args.length; i++) {
+      menuItem[i] = new JMenuItem(args[i]);
+      menu.add(menuItem[i]);
+      menuItem[i].addActionListener(listener);
+    }
+    return menu;
+  }
+
   public static void main(String[] args) {
     DrawingYata2 drawing = new DrawingYata2();
     drawing.setPreferredSize(new Dimension(600, 400));
     JButton jbutton = new JButton("clear");
+    JMenuBar menubar = new JMenuBar();
+    JMenu menu;
+    String[] menuItem = new String[3];
+    menuItem[0] = "new";
+    menuItem[1] = "open";
+    menuItem[2] = "save";
+    menu = drawing.createMenu(menuItem, "file", drawing);
+    menubar.add(menu);
+    menubar.add(Box.createRigidArea(new Dimension(5, 1)));
+ 
     jbutton.addActionListener(drawing);
     Container container = jframe.getContentPane();
     container.setLayout(new BorderLayout());
-    jframe.add(drawing, BorderLayout.NORTH);
+    jframe.add(menubar, BorderLayout.NORTH);
+    jframe.add(drawing, BorderLayout.CENTER);
     jframe.add(jbutton, BorderLayout.SOUTH);
     jframe.pack();
     jframe.setResizable(false);
