@@ -48,7 +48,6 @@ public class DrawingYata2 extends JPanel implements MouseListener,
 
   public void mouseDragged(MouseEvent e) {
     pnt2 = e.getPoint();
-    //repaint();
     this.drawLineMethod();
   }
 
@@ -59,35 +58,31 @@ public class DrawingYata2 extends JPanel implements MouseListener,
 
   //線を引く
   public void drawLineMethod() {
+    bufferGraphics.setColor(Color.black);
     bufferGraphics.drawLine(pnt.x, pnt.y, pnt2.x, pnt2.y);
     pnt = pnt2;
-    //System.out.println("draw");
     repaint();
   }
 
   public void paintComponent(Graphics g) {
-    //g.setColor(Color.black);
     if(clear) {
       this.createBuffer(this.getWidth(), this.getHeight());
+      System.out.println('b');
     } else {
-      //this.drawLineMethod();
     }
     super.paintComponent(g);
     if(bufferImage != null) {
-      //System.out.println("bufferimage");
       g.drawImage(bufferImage, 0, 0, this);
     }
   }
 
   private void createBuffer(int width, int height) {
-    //System.out.println("create");
     bufferImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_BGR);
     bufferGraphics = bufferImage.createGraphics();
     bufferGraphics.setBackground(Color.white);
     bufferGraphics.clearRect(0, 0, width, height);
     clear = false;
   }
-
   public static void main(String[] args) {
     DrawingYata2 drawing = new DrawingYata2();
     drawing.setPreferredSize(new Dimension(600, 400));
