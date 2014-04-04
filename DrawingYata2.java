@@ -52,6 +52,7 @@ public class DrawingYata2 extends JPanel implements MouseListener,
   }
 
   public void actionPerformed(ActionEvent e) {
+    // TODO もっとメニュー名が増えてもいいようにしたい
     if(e.getActionCommand() == "clear" ||
        e.getActionCommand() == "new") {
       clear = true;
@@ -109,9 +110,14 @@ public class DrawingYata2 extends JPanel implements MouseListener,
     try {
       ImageIO.write(bufferImage, "png", file);
     } catch(IOException e) {
-      System.out.println("error");
+      this.alert("error");
       return;
     }
+  }
+
+  public void alert(String str) {
+    JLabel label = new JLabel(str);
+    JOptionPane.showMessageDialog(this, label);
   }
 
   public static void main(String[] args) {
