@@ -52,8 +52,18 @@ public class DrawingYata2 extends JPanel implements MouseListener,
   }
 
   public void actionPerformed(ActionEvent e) {
-    clear = true;
-    repaint();
+    if(e.getActionCommand() == "clear" ||
+       e.getActionCommand() == "new") {
+      clear = true;
+      repaint();
+    }
+
+    if(e.getActionCommand() == "open") {
+    }
+
+    if(e.getActionCommand() == "save") {
+      this.saveImage(new File("out.png"));
+    }
   }
 
   //線を引く
@@ -93,6 +103,15 @@ public class DrawingYata2 extends JPanel implements MouseListener,
       menuItem[i].addActionListener(listener);
     }
     return menu;
+  }
+
+  public void saveImage(File file) {
+    try {
+      ImageIO.write(bufferImage, "png", file);
+    } catch(IOException e) {
+      System.out.println("error");
+      return;
+    }
   }
 
   public static void main(String[] args) {
