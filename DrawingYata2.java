@@ -52,17 +52,17 @@ public class DrawingYata2 extends JPanel implements MouseListener,
   }
 
   public void actionPerformed(ActionEvent e) {
-    if(e.getActionCommand() == "clear" ||
-       e.getActionCommand() == "new") {
+    if(e.getActionCommand().equals("clear") ||
+       e.getActionCommand().equals("new")) {
       clear = true;
       repaint();
     }
 
-    if(e.getActionCommand() == "open") {
+    if(e.getActionCommand().equals("open")) {
       this.openImage();
     }
 
-    if(e.getActionCommand() == "save") {
+    if(e.getActionCommand().equals("save")) {
       this.saveImage();
     }
   }
@@ -107,10 +107,11 @@ public class DrawingYata2 extends JPanel implements MouseListener,
   }
 
   public void openImage() {
-    try {String fileName = this.chooseFile("open");
-      if(fileName == "error") {
-        this.alert("error");
-      } else if(fileName == "cancel") {
+    try {
+      String fileName = this.chooseFile("open");
+      if(fileName.equals("error")) {
+        this.alert("error1");
+      } else if(fileName.equals("cancel")) {
         this.alert("canceled");
       } else {
         File file = new File(fileName);
@@ -123,7 +124,7 @@ public class DrawingYata2 extends JPanel implements MouseListener,
         this.alert("success");
       }
     } catch(IOException e) {
-      this.alert("error");
+      this.alert("error2");
       return;
     }
   }
@@ -131,9 +132,9 @@ public class DrawingYata2 extends JPanel implements MouseListener,
   public void saveImage() {
     try {
       String fileName = this.chooseFile("save");
-      if(fileName == "error") {
+      if(fileName.equals("error")) {
         this.alert("error");
-      } else if(fileName == "cancel") {
+      } else if(fileName.equals("cancel")) {
         this.alert("canceled");
       } else {
         File file = new File(fileName);
@@ -158,7 +159,12 @@ public class DrawingYata2 extends JPanel implements MouseListener,
     } else {
       int point = str.lastIndexOf(".");
       if(point != -1) {
-        result = str.substring(point+1);
+        String extension = str.substring(point+1);
+        if(extension.equals("png") || extension.equals("jpg")) {
+          result = extension;
+        } else {
+          result = null;
+        }
       } else {
         result = null;
       }
@@ -170,14 +176,19 @@ public class DrawingYata2 extends JPanel implements MouseListener,
     JFileChooser filechooser = new JFileChooser();
     Integer selected = null;
     
-    if(str == "open") {
+    if(str.equals("open")) {
       selected = filechooser.showOpenDialog(this);
     } else {
       selected = filechooser.showSaveDialog(this);
     }
     if(selected == JFileChooser.APPROVE_OPTION) {
       File file = filechooser.getSelectedFile();
-      return file.getName();
+      String extension = this.getExtension(file.getName());
+      if(extension != null) {
+        return file.getAbsolutePath();//file.getName();
+      } else {
+        return "error";
+      }
     } else if(selected == JFileChooser.CANCEL_OPTION) {
       return "cancel";
     } else {
