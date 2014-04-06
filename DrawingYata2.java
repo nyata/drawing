@@ -52,7 +52,6 @@ public class DrawingYata2 extends JPanel implements MouseListener,
   }
 
   public void actionPerformed(ActionEvent e) {
-    // TODO もっとメニュー名が増えてもいいようにしたい
     if(e.getActionCommand() == "clear" ||
        e.getActionCommand() == "new") {
       clear = true;
@@ -60,10 +59,11 @@ public class DrawingYata2 extends JPanel implements MouseListener,
     }
 
     if(e.getActionCommand() == "open") {
+      this.openImage();
     }
 
     if(e.getActionCommand() == "save") {
-      this.saveImage(new File("out.png"));
+      this.saveImage();
     }
   }
 
@@ -106,12 +106,82 @@ public class DrawingYata2 extends JPanel implements MouseListener,
     return menu;
   }
 
-  public void saveImage(File file) {
-    try {
-      ImageIO.write(bufferImage, "png", file);
+  public void openImage() {
+    try {String fileName = this.chooseFile("open");
+      if(fileName == "error") {
+        this.alert("error");
+      } else if(fileName == "cancel") {
+        this.alert("canceled");
+      } else {
+        File file = new File(fileName);
+        BufferedImage openImage = ImageIO.read(file);
+        
+        this.createBuffer(openImage.getWidth(), openImage.getHeight());
+        bufferGraphics.drawImage(openImage, 0, 0, this);
+        repaint();
+        
+        this.alert("success");
+      }
     } catch(IOException e) {
       this.alert("error");
       return;
+    }
+  }
+
+  public void saveImage() {
+    try {
+      String fileName = this.chooseFile("save");
+      if(fileName == "error") {
+        this.alert("error");
+      } else if(fileName == "cancel") {
+        this.alert("canceled");
+      } else {
+        File file = new File(fileName);
+        String extension = this.getExtension(fileName);
+        if(extension != null) {
+          ImageIO.write(bufferImage, extension, file);
+          this.alert("success");
+        } else {
+          this.alert("error");
+        }
+      }
+    } catch(IOException e) {
+      this.alert("error");
+      return;
+    }
+  }
+  
+  private static String getExtension(String str) {
+    String result;
+    if(str == null) {
+       result = null;
+    } else {
+      int point = str.lastIndexOf(".");
+      if(point != -1) {
+        result = str.substring(point+1);
+      } else {
+        result = null;
+      }
+    }
+    return result;
+  }
+
+  private String chooseFile(String str) {
+    JFileChooser filechooser = new JFileChooser();
+    Integer selected = null;
+    
+    if(str == "open") {
+      selected = filechooser.showOpenDialog(this);
+    } else {
+      selected = filechooser.showSaveDialog(this);
+    }
+    if(selected == JFileChooser.APPROVE_OPTION) {
+      File file = filechooser.getSelectedFile();
+      return file.getName();
+    } else if(selected == JFileChooser.CANCEL_OPTION) {
+      return "cancel";
+    } else {
+      return "error";
     }
   }
 
