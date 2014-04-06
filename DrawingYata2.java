@@ -21,6 +21,9 @@ public class DrawingYata2 extends JPanel implements MouseListener,
   BufferedImage bufferImage = null;
   Graphics2D bufferGraphics = null;
   static JFrame jframe = new JFrame("mouseEventTest");
+  int panelWidth = 600;
+  int panelHeight = 400;
+  Boolean openFlag = false;
 
   public DrawingYata2() {
     addMouseMotionListener(this);
@@ -52,17 +55,17 @@ public class DrawingYata2 extends JPanel implements MouseListener,
   }
 
   public void actionPerformed(ActionEvent e) {
-    if(e.getActionCommand() == "clear" ||
-       e.getActionCommand() == "new") {
+    if(e.getActionCommand().equals("clear") ||
+       e.getActionCommand().equals("new")) {
       clear = true;
       repaint();
     }
 
-    if(e.getActionCommand() == "open") {
+    if(e.getActionCommand().equals("open")) {
       this.openImage();
     }
 
-    if(e.getActionCommand() == "save") {
+    if(e.getActionCommand().equals("save")) {
       this.saveImage();
     }
   }
@@ -77,7 +80,9 @@ public class DrawingYata2 extends JPanel implements MouseListener,
 
   public void paintComponent(Graphics g) {
     if(clear) {
-      this.createBuffer(this.getWidth(), this.getHeight());
+      panelWidth = this.getWidth();
+      panelHeight = this.getHeight();
+      this.createBuffer();
     } else {
     }
     super.paintComponent(g);
@@ -86,11 +91,12 @@ public class DrawingYata2 extends JPanel implements MouseListener,
     }
   }
 
-  private void createBuffer(int width, int height) {
-    bufferImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_BGR);
+  private void createBuffer() {
+          System.out.println(panelWidth);
+    bufferImage = new BufferedImage(panelWidth, panelHeight, BufferedImage.TYPE_INT_BGR);
     bufferGraphics = bufferImage.createGraphics();
     bufferGraphics.setBackground(Color.white);
-    bufferGraphics.clearRect(0, 0, width, height);
+    bufferGraphics.clearRect(0, 0, panelWidth, panelHeight);
     clear = false;
   }
 
@@ -107,23 +113,28 @@ public class DrawingYata2 extends JPanel implements MouseListener,
   }
 
   public void openImage() {
-    try {String fileName = this.chooseFile("open");
-      if(fileName == "error") {
-        this.alert("error");
-      } else if(fileName == "cancel") {
+    try {
+      String fileName = this.chooseFile("open");
+      if(fileName.equals("error")) {
+        this.alert("error1");
+      } else if(fileName.equals("cancel")) {
         this.alert("canceled");
       } else {
+       jframe.setVisible(false);
         File file = new File(fileName);
         BufferedImage openImage = ImageIO.read(file);
         
-        this.createBuffer(openImage.getWidth(), openImage.getHeight());
+        panelWidth = openImage.getWidth();
+        panelHeight = openImage.getHeight();
+        this.makeWindow(new DrawingYata2(), panelWidth, panelHeight);
+        this.createBuffer();
         bufferGraphics.drawImage(openImage, 0, 0, this);
-        repaint();
+        //repaint();
         
         this.alert("success");
       }
     } catch(IOException e) {
-      this.alert("error");
+      this.alert("error2");
       return;
     }
   }
@@ -131,9 +142,9 @@ public class DrawingYata2 extends JPanel implements MouseListener,
   public void saveImage() {
     try {
       String fileName = this.chooseFile("save");
-      if(fileName == "error") {
+      if(fileName.equals("error")) {
         this.alert("error");
-      } else if(fileName == "cancel") {
+      } else if(fileName.equals("cancel")) {
         this.alert("canceled");
       } else {
         File file = new File(fileName);
@@ -158,7 +169,12 @@ public class DrawingYata2 extends JPanel implements MouseListener,
     } else {
       int point = str.lastIndexOf(".");
       if(point != -1) {
-        result = str.substring(point+1);
+        String extension = str.substring(point+1);
+        if(extension.equals("png") || extension.equals("jpg")) {
+          result = extension;
+        } else {
+          result = null;
+        }
       } else {
         result = null;
       }
@@ -170,14 +186,19 @@ public class DrawingYata2 extends JPanel implements MouseListener,
     JFileChooser filechooser = new JFileChooser();
     Integer selected = null;
     
-    if(str == "open") {
+    if(str.equals("open")) {
       selected = filechooser.showOpenDialog(this);
     } else {
       selected = filechooser.showSaveDialog(this);
     }
     if(selected == JFileChooser.APPROVE_OPTION) {
       File file = filechooser.getSelectedFile();
-      return file.getName();
+      String extension = this.getExtension(file.getName());
+      if(extension != null) {
+        return file.getAbsolutePath();//file.getName();
+      } else {
+        return "error";
+      }
     } else if(selected == JFileChooser.CANCEL_OPTION) {
       return "cancel";
     } else {
@@ -189,10 +210,9 @@ public class DrawingYata2 extends JPanel implements MouseListener,
     JLabel label = new JLabel(str);
     JOptionPane.showMessageDialog(this, label);
   }
-
-  public static void main(String[] args) {
-    DrawingYata2 drawing = new DrawingYata2();
-    drawing.setPreferredSize(new Dimension(600, 400));
+  
+  public void makeWindow(DrawingYata2 drawing, int width, int height) {
+    drawing.setPreferredSize(new Dimension(width, height));
     JButton jbutton = new JButton("clear");
     JMenuBar menubar = new JMenuBar();
     JMenu menu;
@@ -218,5 +238,11 @@ public class DrawingYata2 extends JPanel implements MouseListener,
         jframe.setVisible(true);
       }
     });
+  }
+
+  public static void main(String[] args) {
+    DrawingYata2 drawing = new DrawingYata2();
+    jframe.getContentPane().removeAll();
+    drawing.makeWindow(drawing, 600, 400);
   }
 }
